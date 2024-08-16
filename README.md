@@ -6,7 +6,7 @@ Este serviço sugere playlists musicais com base na temperatura atual de uma cid
 - Se estiver entre 10°C e 25°C, o serviço deverá sugerir músicas de Rock;
 - Se estiver abaixo de 10°C, o serviço deverá sugerir músicas clássicas.
 
-## Endpoints da PI
+## Endpoints da API
 
 *GET* `/login`:
 - Descrição: Inicia o fluxo de OAuth com o Spotify. Redireciona o usuário para a página de login do Spotify para autenticação.
