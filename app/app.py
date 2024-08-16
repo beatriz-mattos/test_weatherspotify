@@ -4,10 +4,12 @@ import base64
 import os
 from dotenv import load_dotenv
 from urllib.parse import urlencode
+from flask_caching import Cache
 
 load_dotenv()
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # API config
 OPENWEATHERMAP_API_KEY = os.getenv('OPENWEATHERMAP_API_KEY')
@@ -15,6 +17,7 @@ SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI')
 
+@cache.cached(timeout=300, key_prefix='weather')
 def get_weather(city):
     url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHERMAP_API_KEY}&units=metric'
     response = requests.get(url)
@@ -23,6 +26,7 @@ def get_weather(city):
         raise Exception(f"Error fetching weather data: {data}")
     return data
 
+@cache.cached(timeout=300, key_prefix=lambda: f'spotify_playlists_{request.args.get("access_token")}_{request.args.get("genre")}')
 def get_spotify_playlists(access_token, genre):
     headers = {
         'Authorization': f'Bearer {access_token}'
@@ -73,6 +77,7 @@ def callback():
     
     return jsonify(token_data)
 
+@cache.cached(timeout=60)
 @app.route('/playlist', methods=['GET'])
 def playlist():
     city = request.args.get('city')
